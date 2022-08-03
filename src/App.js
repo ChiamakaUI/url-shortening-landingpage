@@ -10,8 +10,7 @@ import Footer from "./Components/Footer";
 
 function App() {
   const [links, setLinks] = useState([]);
-  const [buttonText, setButtonText] = useState("Copy");
-  const [copied, setCopied] = useState(false);
+  const [selected, setSelected] = useState("");
 
   const ref = React.createRef();
   const shortenLink = () => {
@@ -25,6 +24,8 @@ function App() {
       .then((res) => res.json())
       .then((data) => getLinks(data.result))
       .catch((err) => console.log(err));
+
+      ref.current.value = ""
   };
 
   const getLinks = (link) => {
@@ -39,8 +40,7 @@ function App() {
   };
   const copyText = (text) => {
     navigator.clipboard.writeText(text);
-    setButtonText("Copied!");
-    setCopied(true);
+    setSelected(text);
   };
   const deleteLink = (ID) => {
     const items = [...links];
@@ -58,31 +58,30 @@ function App() {
       <Main />
 
       <div className="second-part">
-      <Input ref={ref} clickFunc={shortenLink} />
-      {links.map((ele) => (
-        <div key={ele.id} className="link-container">
-          <p>{ele.original}</p>
-          <div>
-            <p>{ele.shortLink}</p>
-            <button
-              onClick={() => copyText(ele.shortLink)}
-              className={copied ? "copied" : "not-copied"}
-            >
-              {buttonText}
-            </button>
-            <GiCancel
-              style={{ color: "red", fontSize: "30px", marginTop: "-90px" }}
-              onClick={() => deleteLink(ele.id)}
-            />
+        <Input ref={ref} clickFunc={shortenLink} />
+        {links.map((ele) => (
+          <div key={ele.id} className="link-container">
+            <p>{ele.original}</p>
+            <div>
+              <p>{ele.shortLink}</p>
+              <button
+                onClick={() => copyText(ele.shortLink)}
+                className={selected === ele.shortLink ? "copied" : "not-copied"}
+              >
+                {selected === ele.shortLink ? "Copied" : "Copy"}
+              </button>
+              <GiCancel
+                style={{ color: "red", fontSize: "30px", marginTop: "-85px" }}
+                onClick={() => deleteLink(ele.id)}
+              />
+            </div>
           </div>
-        </div>
-      ))}
-      <StatDisplay/>
+        ))}
+        <StatDisplay />
       </div>
-    <Footer/>
+      <Footer />
     </div>
   );
 }
 
 export default App;
-/* <button onClick={() => {navigator.clipboard.writeText(ele.shortLink)}}>{buttonText}</button> */
